@@ -1,7 +1,6 @@
-proc import datafile='C:\Users\Phill\MSA Drive\Google Drive\MSA\Classes\Logistic Regression\HW2\fludata.csv'
-			out = work.FluData
-			dbms = csv
-			replace; 
+data fludata; 
+	set logistic.fludata; 
+run; 
 
 proc logistic data=fludata
 	plots(only)= (effect(clband showobs) oddsratio); 
