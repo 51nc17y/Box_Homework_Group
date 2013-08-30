@@ -339,7 +339,7 @@ proc logistic data=flu3 plots(only)=(effect(clband showobs) oddsratio);
 	class 	gender 		(param=ref ref='Female')
 			IncLevel 	(param=ref ref='3')
 			Race		(param=effects ref='Other'); 
-	model	flu(event='Yes')= Gender IncLevel Race / clodds = pl details lackfit rsq;
+	model	flu(event='Yes')= Gender age / clodds = pl details lackfit rsq;
 	title 'Model with all significant variables at a 5% level'; 
 run; 
 
@@ -392,7 +392,7 @@ proc logistic data=flu3;
 			race	(param=effects ref='Other')
 			Previous(param=ref ref='No'); 
 	model 	flu(event='Yes') = Race IncLevel Gender Previous Age Distance Visits; 
-/*	ROC		'Just Gender'	Gender; */
+	ROC		'Just Gender'	Gender; 
 /*	ROC 	'Income Race' 	inclevel race; */
 /*	ROC		'Gender Income'	Gender IncLevel; */
 /*	ROC		'RAce Gender'	Gender Race; */
@@ -416,11 +416,25 @@ run;
 
 data Youden; 
 	set Roc;
-	J = _sensit_+(1+_1mspec_)-1;
+	Spec = abs(_1mspec_-1);
+	J = _sensit_+spec-1;
 run; 
 
 proc print data=Youden; 
 run;  
+
+/*Obs _PROB_ _POS_ _NEG_ _FALPOS_ _FALNEG_ _SENSIT_ _1MSPEC_   Spec 	    J */
+/*5  0.40107   61   183     51       52    0.53982   0.21795 0.78205 0.32187 */
+
+title 'Classification Table with Cutoff .32187'; 
+proc logistic data=flu3; 
+	class 	gender	(param=ref ref='Female') 
+			inclevel(param=ref ref='3')
+			race	(param=effect ref='Other');
+	model 	flu(event='Yes') = Gender Inclevel Race / ctable pprob=0.40;
+run; 
+
+
 ***********************************************************************************
 * 			                     HOMEWORK PART III                                +
 ***********************************************************************************
