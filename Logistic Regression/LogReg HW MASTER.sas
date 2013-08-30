@@ -322,18 +322,105 @@ proc logistic data=flu3 plots(only)=(effect(clband showobs) oddsratio);
 run;
 
 /* Backward selection */
-proc logistic data=flu3 plots(only)=(effect(clband showobs) oddsratio);
-	class gender(param=ref ref='Female')
-		IncLevel(param=ref ref='3')
-		Previous(param=ref ref='No')
-		Race (ref='Other');
-	model flu(event='Yes') = Race IncLevel Gender Previous Age Distance Visits / 
-			clodds=pl selection=backward details lackfit;
-	units Age=10;
-	title 'Backward Selection Flu Logistic Model after merging Hispanics and Other';
-run;
+/*proc logistic data=flu3 plots(only)=(effect(clband showobs) oddsratio);*/
+/*	class gender(param=ref ref='Female')*/
+/*		IncLevel(param=ref ref='3')*/
+/*		Previous(param=ref ref='No')*/
+/*		Race (ref='Other');*/
+/*	model flu(event='Yes') = Race IncLevel Gender Previous Age Distance Visits / */
+/*			clodds=pl selection=backward details lackfit;*/
+/*	units Age=10;*/
+/*	title 'Backward Selection Flu Logistic Model after merging Hispanics and Other';*/
+/*run;*/
 
+/*checking for Goodness-of-fit with Hosmer-Lemeshow test*/
 
+proc logistic data=flu3 plots(only)=(effect(clband showobs) oddsratio); 
+	class 	gender 		(param=ref ref='Female')
+			IncLevel 	(param=ref ref='3')
+			Race		(param=effects ref='Other'); 
+	model	flu(event='Yes')= Gender IncLevel Race / clodds = pl details lackfit rsq;
+	title 'Model with all significant variables at a 5% level'; 
+run; 
+
+/*Partition for the Hosmer and Lemeshow Test */
+/*Group Total Flu = Yes Flu = No  */
+/*Observed Expected Observed Expected */
+/*1 26 4 3.61 22 22.39 */
+/*2 37 8 5.52 29 31.48 */
+/*3 8 1 1.73 7 6.27 */
+/*4 81 20 20.17 61 60.83 */
+/*5 30 8 8.18 22 21.82 */
+/*6 28 4 8.69 24 19.31 */
+/*7 33 12 13.23 21 19.77 */
+/*8 69 34 31.70 35 37.30 */
+/*9 35 22 20.18 13 14.82 */
+/**/
+/**/
+/**/
+/*Hosmer and Lemeshow Goodness-of-Fit*/
+/*Test */
+/*Chi-Square DF Pr > ChiSq */
+/*6.3090 7 0.5042 */
+
+/*Problmens in group 	4 (total<10, expected<2) only 9 groups?*/
+/*Test verifies that there is no difference between ours and the */
+/*fully saturated model proposed by the test*/
+
+/*R-Square 0.0835 Max-rescaled R-Square 0.1165 */
+
+proc logistic data=flu3 plots(only)=(effect(clband showobs) oddsratio); 
+	class 	gender 		(param=ref ref='Female');
+	model	flu(event='Yes')= Gender / clodds = pl lackfit rsq;
+	title 'Gender Model'; 
+run; 
+
+/*Hosmer and Lemeshow Goodness-of-Fit
+Test 
+Chi-Square DF Pr > ChiSq 
+0.0000 0 >>>> si tge nidek IS different than the saturated model>>
+
+*******PROBLEM!!!!!!**********
+
+/*R-Square 0.0477 Max-rescaled R-Square 0.0665 */
+
+***************ROC OUR MODEL***********************; 
+
+proc logistic data=flu3; 
+	class 	gender	(param=ref ref='Female') 
+			inclevel(param=ref ref='3')
+			race	(param=effects ref='Other')
+			Previous(param=ref ref='No'); 
+	model 	flu(event='Yes') = Race IncLevel Gender Previous Age Distance Visits; 
+/*	ROC		'Just Gender'	Gender; */
+/*	ROC 	'Income Race' 	inclevel race; */
+/*	ROC		'Gender Income'	Gender IncLevel; */
+/*	ROC		'RAce Gender'	Gender Race; */
+	ROC		'Gender, Rsce, Income' Gender Race IncLevel; 
+	ROCcontrast / estimate=allpairs; 
+	title 'Comparing ROC Curves'; 
+run; 
+
+/*Gender, Income and Gender, Income, Race are the only ones that are not different */
+/*from Full Model's performance. */
+title 'Youden Index';
+proc logistic data=flu3; 
+	class 	gender	(param=ref ref='Female') 
+			inclevel(param=ref ref='3')
+			race	(param=effect ref='Other');
+	model 	flu(event='Yes') = Gender Inclevel Race / outroc=ROC;
+run; 
+
+proc print data=roc; 
+run;  
+
+data Youden; 
+	set Roc;
+	J = _sensit_+(1+_1mspec_)-1;
+run; 
+
+proc print data=Youden; 
+run;  
 ***********************************************************************************
 * 			                     HOMEWORK PART III                                +
 ***********************************************************************************
