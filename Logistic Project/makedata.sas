@@ -1,6 +1,6 @@
 libname AL "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project";
 
-PROC IMPORT OUT= AL.BidHX 
+PROC IMPORT OUT= BidHX 
             DATAFILE= "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project\Construction Data.xls" 
             DBMS=EXCEL REPLACE;
      RANGE="'Bid History$'"; 
@@ -11,6 +11,13 @@ PROC IMPORT OUT= AL.BidHX
      SCANTIME=YES;
 RUN;
 
+
+DATA AL.BIDHX;
+SET BIDHX;
+  N_KEY_COMP = SUM(OF COMPETITOR_A -- COMPETITOR_J);
+  LABEL N_KEY_COMP = "Number of Key Competitors Bidding";
+RUN;
+  
 
 
 
