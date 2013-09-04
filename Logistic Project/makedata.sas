@@ -1,60 +1,7 @@
-
-/*Put your folder directory here where you saved Construction Data.xls; */
-%LET PATH = C:\Users\Phill\Documents\GitHub\Box_Homework_Group\Logistic Project; 
-
-libname AL "&PATH";
+libname AL "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project";
 
 PROC IMPORT OUT= BidHX 
-            DATAFILE= "&PATH\Construction Data.xls" 
-            DBMS=EXCEL REPLACE;
-     RANGE="'Bid History$'"; 
-     GETNAMES=YES;
-     MIXED=NO;
-     SCANTEXT=YES;
-     USEDATE=YES;
-     SCANTIME=YES;
-RUN;
-
-
-DATA AL.BIDHX;
-SET BIDHX;
-  N_KEY_COMP = SUM(OF COMPETITOR_A -- COMPETITOR_J);
-  LABEL N_KEY_COMP = "Number of Key Competitors Bidding";
-RUN;
-  
-
-
-
-PROC IMPORT OUT= AL.FIRMA 
-            DATAFILE= "&PATH\Construction Data.xls" 
-            DBMS=EXCEL REPLACE;
-     RANGE="'Engineering Firm A$'"; 
-     GETNAMES=YES;
-     MIXED=NO;
-     SCANTEXT=YES;
-     USEDATE=YES;
-     SCANTIME=YES;
-RUN;
-
-
-
-PROC IMPORT OUT= AL.FIRMB
-            DATAFILE= "&PATH\Construction Data.xls" 
-            DBMS=EXCEL REPLACE;
-     RANGE="'Engineering Firm B$'"; 
-     GETNAMES=YES;
-     MIXED=NO;
-     SCANTEXT=YES;
-     USEDATE=YES;
-     SCANTIME=YES;
-RUN;
-
-/*Creating the Validation Set*/
-
-/*RANUNI gives a random number from 0 to 1.  the value in the () is the seed; if we all use the same seed, we will get the same records in test and bid*/
-
-PROC IMPORT OUT= BidHX 
-            DATAFILE= "&PATH\Construction Data.xls" 
+            DATAFILE= "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project\Construction Data.xls" 
             DBMS=EXCEL REPLACE;
      RANGE="'Bid History$'"; 
      GETNAMES=YES;
@@ -72,4 +19,44 @@ SET BIDHX;
   IF RAND < .85 THEN OUTPUT AL.BID_TEST; ELSE OUTPUT AL.BID_VAL;
   DROP RAND;
   LABEL N_KEY_COMP = "Number of Key Competitors Bidding";
+RUN;
+  
+
+
+
+PROC IMPORT OUT= FIRMA 
+            DATAFILE= "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project\Construction Data.xls" 
+            DBMS=EXCEL REPLACE;
+     RANGE="'Engineering Firm A$'"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
+
+DATA AL.FIRMA_TEST AL.FIRMA_VAL;
+SET FIRMA;
+  RAND = RANUNI(129);
+  IF RAND < .85 THEN OUTPUT AL.FIRMA_TEST; ELSE OUTPUT AL.FIRMA_VAL;
+RUN;
+
+
+
+PROC IMPORT OUT= FIRMB
+            DATAFILE= "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project\Construction Data.xls" 
+            DBMS=EXCEL REPLACE;
+     RANGE="'Engineering Firm B$'"; 
+     GETNAMES=YES;
+     MIXED=NO;
+     SCANTEXT=YES;
+     USEDATE=YES;
+     SCANTIME=YES;
+RUN;
+
+
+DATA AL.FIRMB_TEST AL.FIRMB_VAL;
+SET FIRMB;
+  RAND = RANUNI(127);
+  IF RAND < .85 THEN OUTPUT AL.FIRMB_TEST; ELSE OUTPUT AL.FIRMB_VAL;
 RUN;
