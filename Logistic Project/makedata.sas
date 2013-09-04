@@ -1,7 +1,9 @@
-libname AL "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project";
+%let PATH = C:\Users\Phill\Documents\GitHub\Box_Homework_Group\Logistic Project;
+
+libname AL "&path";
 
 PROC IMPORT OUT= BidHX 
-            DATAFILE= "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project\Construction Data.xls" 
+            DATAFILE= "&path\Construction Data.xls" 
             DBMS=EXCEL REPLACE;
      RANGE="'Bid History$'"; 
      GETNAMES=YES;
@@ -10,6 +12,7 @@ PROC IMPORT OUT= BidHX
      USEDATE=YES;
      SCANTIME=YES;
 RUN;
+
 
 
 DATA AL.BID_TEST AL.BID_VAL;
@@ -25,7 +28,7 @@ RUN;
 
 
 PROC IMPORT OUT= FIRMA 
-            DATAFILE= "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project\Construction Data.xls" 
+            DATAFILE= "&path\Construction Data.xls" 
             DBMS=EXCEL REPLACE;
      RANGE="'Engineering Firm A$'"; 
      GETNAMES=YES;
@@ -44,7 +47,7 @@ RUN;
 
 
 PROC IMPORT OUT= FIRMB
-            DATAFILE= "C:\Users\jwbox\Documents\IAA\Fall\Logistic Regression\Project\Construction Data.xls" 
+            DATAFILE= "&path\Construction Data.xls" 
             DBMS=EXCEL REPLACE;
      RANGE="'Engineering Firm B$'"; 
      GETNAMES=YES;
@@ -60,3 +63,47 @@ SET FIRMB;
   RAND = RANUNI(127);
   IF RAND < .85 THEN OUTPUT AL.FIRMB_TEST; ELSE OUTPUT AL.FIRMB_VAL;
 RUN;
+
+PROC FORMAT; 
+	VALUE SECTORFMT
+	1	=  	'Transportation'
+	2	=	'Lodging'
+	3	=  	'Multi-family Residential'
+	4	=	'Amusement and Recreation'
+	5	=	'Highway and Street'
+	6	=  	'Education'
+	7  	=	'Healthcare'
+	8  	=	'Manufacturing'
+	9  	=	'Power'
+	10  =	'Military';
+RUN; 
+
+DATA AL.BID_VAL;
+	SET AL.BID_VAL; 
+	FORMAT SECTOR SECTORFMT.; 
+RUN;
+
+DATA AL.FIRMA_VAL;
+	SET AL.FIRMA_VAL; 
+	FORMAT SECTOR SECTORFMT.; 
+RUN; 
+
+DATA AL.FIRMB_VAL;
+	SET AL.FIRMB_VAL; 
+	FORMAT SECTOR SECTORFMT.; 
+RUN;  
+
+DATA AL.BID_TEST;
+	SET AL.BID_TEST; 
+	FORMAT SECTOR SECTORFMT.; 
+RUN;
+
+DATA AL.FIRMA_TEST;
+	SET AL.FIRMA_TEST; 
+	FORMAT SECTOR SECTORFMT.; 
+RUN; 
+
+DATA AL.FIRMB_TEST;
+	SET AL.FIRMB_TEST; 
+	FORMAT SECTOR SECTORFMT.; 
+RUN;  
