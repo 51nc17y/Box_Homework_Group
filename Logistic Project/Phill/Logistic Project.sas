@@ -1,10 +1,3 @@
-data Bid; 
-	set al.bid_test; 
-	cost = Estimated_Cost__Millions_; 
-	time = estimated_years_to_complete;
-	plan = cost_after_engineering_estimate_;
-	region = region_of_country; 
-run; 
 *CHECKING FOR CONFOUNDING AND INTERACTIONS; 
 proc freq data=bid nlevels; 
 	tables win_bid*region win_bid*sector / chisq measures plots(only) = freqplot (scale=percent twoway=stacked);
@@ -18,11 +11,13 @@ run;
 proc logistic data=bid alpha=.001
 	plots (only) =(oddsratio effect(clband showobs)); 
 	class region(param=effect ref='Northeast') sector (param=effect ref='Military') ; 
-	BACK:	model	win_bid(event='Yes') = cost time bid_price sector region number_of_competitor_bids actual_cost competitor_a competitor_b competitor_c competitor_d competitor_e competitor_f competitor_g competitor_h competitor_i competitor_j
-			/clodds=pl selection=backward slstay=.0001 ;
+/*	BACK:	model	win_bid(event='Yes') = cost time bid_price sector region number_of_competitor_bids actual_cost competitor_a competitor_b competitor_c competitor_d competitor_e competitor_f competitor_g competitor_h competitor_i competitor_j*/
+/*			/clodds=pl selection=backward slstay=.0001 ;*/
 /*	STEP:	model	win_bid(event='Yes') = cost time bid_price sector region number_of_competitor_bids actual_cost competitor_a competitor_b competitor_c competitor_d competitor_e competitor_f competitor_g competitor_h competitor_i competitor_j*/
 /*			/clodds=pl selection=stepwise slentry=.05 slstay=.001;*/
- run; 
+	FWD:	model win_bid(event='Yes') = sector region est_cost est_years bid_price num_bids actual_cost competitor_a competitor_b competitor_c competitor_d competitor_e competitor_f competitor_g competitor_h competitor_i competitor_j
+			/clodds=PL selection=forward slentry=.0001 hierarchy=single include=2; 
+run; 
 
 /* proc sgplot data=bid; */
 /* 	scatter x=winning_bid_price Y=bid_price; */
