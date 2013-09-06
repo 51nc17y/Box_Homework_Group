@@ -29,5 +29,9 @@ proc logistic data=flu
 			/*INC:model 	flu(event='Yes') = gender income / clodds=PL;*/
 			/*ALL:model 	flu(event='Yes') = gender income race previous age distance visits /selection=backwards clodds=PL;*/
 			MAIN:	model 	flu(event='Yes') = gender  income race/ clodds=PL;
-	output 	out=predict p=pred; 
+	output 	out=predict p=pred dfbeta=betas; 
 run;  
+
+proc print data=predict; 
+	where dfbeta gt .01 ; 
+run; 

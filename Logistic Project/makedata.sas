@@ -14,9 +14,8 @@ PROC IMPORT OUT= BidHX
 RUN;
 
 
-
-DATA AL.BID_TEST AL.BID_VAL;
-SET BIDHX;
+DATA AL.BID_TEST AL.BID_VAL ;
+SET BIDHX (rename=(Estimated_Cost__Millions_=Est_cost estimated_years_to_complete=est_years cost_after_engineering_estimate_=est_eng  region_of_country=region Winning_Bid_Price=Win_Price));
   N_KEY_COMP = SUM(OF COMPETITOR_A -- COMPETITOR_J);
   RAND = RANUNI(12345);
   IF RAND < .85 THEN OUTPUT AL.BID_TEST; ELSE OUTPUT AL.BID_VAL;
@@ -24,8 +23,6 @@ SET BIDHX;
   LABEL N_KEY_COMP = "Number of Key Competitors Bidding";
 RUN;
   
-
-
 
 PROC IMPORT OUT= FIRMA 
             DATAFILE= "&path\Construction Data.xls" 
