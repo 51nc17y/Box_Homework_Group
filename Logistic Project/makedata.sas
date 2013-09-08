@@ -15,7 +15,7 @@ RUN;
 
 
 DATA AL.BID_TEST AL.BID_VAL ;
-SET BIDHX (rename=(Estimated_Cost__Millions_=Est_cost estimated_years_to_complete=est_years cost_after_engineering_estimate_=est_eng  region_of_country=region Winning_Bid_Price=Win_Price number_of_competitor_bids=num_bids));
+SET BIDHX (rename=(Estimated_Cost__Millions_=est_cost estimated_years_to_complete=est_years cost_after_engineering_estimate_=est_eng  region_of_country=region Winning_Bid_Price=Win_Price number_of_competitor_bids=num_bids));
   N_KEY_COMP = SUM(OF COMPETITOR_A -- COMPETITOR_J);
   RAND = RANUNI(12345);
   IF RAND < .85 THEN OUTPUT AL.BID_TEST; ELSE OUTPUT AL.BID_VAL;
@@ -73,6 +73,7 @@ PROC FORMAT;
 	8  	=	'Manufacturing'
 	9  	=	'Power'
 	10  =	'Military';
+	11	=	'Power or Manufacturing'; 
 RUN; 
 
 DATA AL.BID_VAL;
